@@ -66,4 +66,8 @@ yarn-debug.log*
 # Ignore uploaded files in development
 /storage/*
 !/storage/.keep
+<<<<<<< HEAD
 /public/uploads
+=======
+/public/uploads
+>>>>>>> 72864b3 (Initial commit upload rails project)
