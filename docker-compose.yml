@@ -1,0 +1,17 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      RAILS_ENV: development
+      RAILS_LOG_TO_STDOUT: "1"
+      SECRET_KEY_BASE: "local-development-secret"
+    volumes:
+      - .:/rails
+      - bundle:/usr/local/bundle
+
+volumes:
+  bundle:
