@@ -1,0 +1,48 @@
+<h1>Import CSV</h1>
+
+<%= form_with url: imports_path, multipart: true, local: true do |f| %>
+  <div>
+    <%= f.file_field :file, accept: ".csv" %>
+  </div>
+
+  <div>
+    <%= f.submit "Import" %>
+  </div>
+<% end %>
+
+<h1>Users</h1>
+
+<div id="users">
+  <table class="table">
+    <thead>
+      <tr class="table-dark">
+        <th>Email</th>
+        <th>First name</th>
+        <th>Last name</th>
+        <th>Phone number</th>
+        <th>Country</th>
+        <th>Company</th>
+        <th>Industry</th>
+        <th>Company size</th>
+        <th>User interests</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @users.each do |user| %>
+        <tr>
+          <td><%= user.email %></td>
+          <td><%= user.fname %></td>
+          <td><%= user.lname %></td>
+          <td><%= user.phone %></td>
+          <td><%= user.country %></td>
+          <td><%= user.company.name %></td>
+          <td><%= user.company.industry %></td>
+          <td><%= user.company.size %></td>
+          <td>
+            <%= user.products.pluck(:name).join(", ") %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

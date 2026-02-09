@@ -10,7 +10,38 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_29_131531) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_07_190447) do
+  create_table "companies", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "industry"
+    t.string "name"
+    t.string "size"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "company_names", force: :cascade do |t|
+    t.integer "company_id"
+    t.datetime "created_at", null: false
+    t.boolean "is_current"
+    t.string "name"
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "name"], name: "index_company_names_on_company_id_and_name", unique: true
+  end
+
+  create_table "product_names", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "is_current"
+    t.string "name"
+    t.integer "product_id"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "products", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "tasks", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -18,4 +49,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_131531) do
     t.string "title"
     t.datetime "updated_at", null: false
   end
+
+  create_table "user_product_interests", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "product_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["product_id"], name: "index_user_product_interests_on_product_id"
+    t.index ["user_id"], name: "index_user_product_interests_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.integer "company_id", null: false
+    t.string "country"
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "fname"
+    t.string "lname"
+    t.string "phone"
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_users_on_company_id"
+  end
+
+  add_foreign_key "user_product_interests", "products"
+  add_foreign_key "user_product_interests", "users"
+  add_foreign_key "users", "companies"
 end
