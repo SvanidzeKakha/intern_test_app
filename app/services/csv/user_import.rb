@@ -34,29 +34,17 @@ module Csv
         c.name = new_name
       end
       
-      current_name = company.company_names.find_by(is_current: true)
+      current_name = company.company_names.find_by(name: new_name)
       
       if current_name.nil?
         CompanyName.create!(
           company: company,
-          name: company.name,
-          is_current: true
+          name: new_name
         )
         return company
       end
       
       return company if current_name.name == new_name
-      
-      CompanyName.transaction do
-        current_name.update!(is_current: false)
-        CompanyName.find_or_create_by!(
-          company: company,
-          name: new_name
-        ).update!(is_current: true)
-        company.update!(name: new_name)
-      end
-      
-      company
     end
     
     def resolve_user(row, company)
@@ -71,54 +59,35 @@ module Csv
     
     def resolve_interests(row, user)
       return if row["products_of_interest"].blank?
-      
-      new_product_names = row["products_of_interest"].split(";").map(&:strip)
-      existing_interests = user.user_product_interests.includes(:product).order(:id)
-      
-      new_product_names.each_with_index do |new_name, index|
-        if existing_interests[index]
-          existing_product = existing_interests[index].product
-          resolve_product(existing_product, new_name)
-        else
-          product = find_create_product(new_name)
-          UserProductInterest.create!(user: user, product: product)
-        end
-      end
-      
-      if new_product_names.length < existing_interests.length
-        existing_interests[new_product_names.length..-1].each(&:destroy)
-      end
+
+      product_names = row["products_of_interest"].split(";").map(&:strip)
+
+      create_missing_products(product_names)
+      create_missing_interests(user, Product.where(name: product_names))
     end
 
-    def resolve_product(product, new_name)
-      return if product.name == new_name
-      
-      existing_by_name = ProductName.find_by(name: new_name)
-      return if existing_by_name && existing_by_name.product_id != product.id
-
-      current_name = product.product_names.find_by(is_current: true)
-
-      ProductName.transaction do
-        current_name.update!(is_current: false) if current_name
-        ProductName.find_or_create_by!(product: product, name: new_name).update!(is_current: true)
-        product.update!(name: new_name)
-      end
+    def create_missing_products(product_names)
+      existing_products = Product.where(name: product_names)
+      products_to_add = product_names - existing_products.pluck(:name) # substract existing product names from all product names
+      products_to_add = products_to_add.map { |product_name| { name: product_name } } # convert into array of hashes for insert_all
+      Product.insert_all(products_to_add)
     end
-    
-    def find_create_product(product_name)
-      existing_product_name = ProductName.find_by(name: product_name)
-      
-      if existing_product_name
-        existing_product_name.product
-      else
-        product = Product.create!(name: product_name)
-        ProductName.create!(
-          product: product,
-          name: product_name,
-          is_current: true
-        )
-        product
+
+    def create_missing_interests(user, products_of_interest)
+      existing_products_of_interest = user.user_product_interests.pluck(:product_id)
+      new_products_of_interest = products_of_interest.pluck(:id)
+
+      interests_to_add = new_products_of_interest - existing_products_of_interest
+      rows = interests_to_add.map do |product_id|
+        {
+          user_id: user.id,
+          product_id: product_id,
+          created_at: Time.now,
+          updated_at: Time.now
+        }
       end
+      
+      UserProductInterest.insert_all(rows)
     end
   end
 end

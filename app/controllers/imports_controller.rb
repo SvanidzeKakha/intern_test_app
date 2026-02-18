@@ -13,7 +13,7 @@ class ImportsController < ApplicationController
 
     Csv::UserImport.call(file)
 
-    redirect_to new_import_path, notice: "CSV imported successfully"
+    redirect_to users_path, notice: "CSV imported successfully"
   rescue StandardError => e
     redirect_to new_import_path, alert: e.message
   end

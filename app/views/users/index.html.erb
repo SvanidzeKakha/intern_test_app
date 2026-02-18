@@ -1,0 +1,60 @@
+<%= link_to "Imporst CSV page", "/imports/new"%>
+
+<h1>Users</h1>
+
+<h3>Find user</h3>
+
+<%= form_tag(users_path, method: :get) do %>
+
+  <%= text_field_tag :search, params[:search], placeholder: "Email" %>
+
+  <%= select_tag :sizes,
+        options_for_select(@sizes, params[:sizes]),
+        multiple: true %>
+
+  <%= select_tag :industries,
+        options_for_select(@industries, params[:industries]),
+        multiple: true %>
+
+  <%= select_tag :product_ids,
+        options_for_select(@products, params[:product_ids]),
+        multiple: true %>
+
+  <%= submit_tag "Search" %>
+
+<% end %>
+
+<div id="users">
+  <table class="table">
+    <thead>
+      <tr class="table-dark">
+        <th>Email</th>
+        <th>First name</th>
+        <th>Last name</th>
+        <th>Phone number</th>
+        <th>Country</th>
+        <th>Company</th>
+        <th>Industry</th>
+        <th>Company size</th>
+        <th>User interests</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @users.each do |user| %>
+        <tr>
+          <td><%= user.email %></td>
+          <td><%= user.fname %></td>
+          <td><%= user.lname %></td>
+          <td><%= user.phone %></td>
+          <td><%= user.country %></td>
+          <td><%= user.company.name %></td>
+          <td><%= user.company.industry %></td>
+          <td><%= user.company.size %></td>
+          <td>
+            <%= user.products.pluck(:name).join(", ") %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
