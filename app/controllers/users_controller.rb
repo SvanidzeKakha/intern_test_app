@@ -6,8 +6,8 @@ class UsersController < ApplicationController
 
     @users = User.includes(:company, user_product_interests: :product)
 
-    if params[:search].present?
-      @users = @users.where("users.email LIKE ?", "%#{params[:search]}%")
+    if params[:email].present?
+      @users = @users.where("users.email LIKE ?", "%#{params[:email]}%")
     end
 
     if params[:sizes].present?
@@ -26,6 +26,8 @@ class UsersController < ApplicationController
     end
 
     @users = @users.distinct
+    @users = @users.paginate(page: params[:page], per_page: 100)
+
   end
 
 end

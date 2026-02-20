@@ -1,4 +1,4 @@
-<%= link_to "Imporst CSV page", "/imports/new"%>
+<%= link_to "Imporst CSV page", new_import_path%>
 
 <h1>Users</h1>
 
@@ -6,7 +6,7 @@
 
 <%= form_tag(users_path, method: :get) do %>
 
-  <%= text_field_tag :search, params[:search], placeholder: "Email" %>
+  <%= text_field_tag :email, params[:email], placeholder: "Email" %>
 
   <%= select_tag :sizes,
         options_for_select(@sizes, params[:sizes]),
@@ -57,4 +57,5 @@
       <% end %>
     </tbody>
   </table>
+  <%= will_paginate @users %>
 </div>
