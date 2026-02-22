@@ -30,4 +30,32 @@ class UsersController < ApplicationController
 
   end
 
+  def download_csv
+    user = User
+            .includes(:company, :products)
+            .where(id: params[:user_ids])
+    
+    csv = CSV.generate(headers: true) do |csv|
+      csv << ["Email", "First name", "Last name", "Phone", "Country", "Company", "Industry", "Size", "Intersts"]
+  
+      user.each do |user|
+        csv << [
+          user.email,
+          user.fname,
+          user.lname,
+          user.phone,
+          user.country,
+          user.company.name,
+          user.company.industry,
+          user.company.size,
+          user.products.pluck(:name).join(", ")
+        ]      
+      end
+    end
+
+
+    send_data csv,
+              filename: "users-#{Date.today}.csv",
+              type: "text/csv"
+  end
 end

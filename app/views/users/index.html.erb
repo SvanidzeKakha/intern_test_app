@@ -23,39 +23,53 @@
   <%= submit_tag "Search" %>
 
 <% end %>
+<div data-controller="download">
+  <button
+    data-download-target="button"
+    data-action="click->download#download"
+    disabled>
+    Download as CSV
+  </button>
 
-<div id="users">
-  <table class="table">
-    <thead>
-      <tr class="table-dark">
-        <th>Email</th>
-        <th>First name</th>
-        <th>Last name</th>
-        <th>Phone number</th>
-        <th>Country</th>
-        <th>Company</th>
-        <th>Industry</th>
-        <th>Company size</th>
-        <th>User interests</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @users.each do |user| %>
-        <tr>
-          <td><%= user.email %></td>
-          <td><%= user.fname %></td>
-          <td><%= user.lname %></td>
-          <td><%= user.phone %></td>
-          <td><%= user.country %></td>
-          <td><%= user.company.name %></td>
-          <td><%= user.company.industry %></td>
-          <td><%= user.company.size %></td>
-          <td>
-            <%= user.products.pluck(:name).join(", ") %>
-          </td>
+  <div id="users">
+    <table class="table">
+      <thead>
+        <tr class="table-dark">
+          <th></th>
+          <th>Email</th>
+          <th>First name</th>
+          <th>Last name</th>
+          <th>Phone number</th>
+          <th>Country</th>
+          <th>Company</th>
+          <th>Industry</th>
+          <th>Company size</th>
+          <th>User interests</th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
-  <%= will_paginate @users %>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td><%= check_box_tag "users_ids[]",
+                                  user.id,
+                                  false,
+                                  data: {download_target: "checkbox", action: "change->download#toggle"}%>
+            </td>
+            <td><%= user.email %></td>
+            <td><%= user.fname %></td>
+            <td><%= user.lname %></td>
+            <td><%= user.phone %></td>
+            <td><%= user.country %></td>
+            <td><%= user.company.name %></td>
+            <td><%= user.company.industry %></td>
+            <td><%= user.company.size %></td>
+            <td>
+              <%= user.products.pluck(:name).join(", ") %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <%= will_paginate @users %>
+  </div>
 </div>
